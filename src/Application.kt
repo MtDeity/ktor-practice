@@ -21,8 +21,7 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 fun Application.module(testing: Boolean = false) {
     val deferred = (1..1_000_000).map { n ->
         GlobalScope.async {
-            delay(1000)
-            n
+            workload(n)
         }
     }
 
@@ -80,4 +79,9 @@ fun CommonAttributeGroupFacade.style(builder: CSSBuilder.() -> Unit) {
 
 suspend inline fun ApplicationCall.respondCss(builder: CSSBuilder.() -> Unit) {
     this.respondText(CSSBuilder().apply(builder).toString(), ContentType.Text.CSS)
+}
+
+suspend fun workload(n: Int): Int {
+    delay(1000)
+    return n
 }
