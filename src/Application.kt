@@ -11,29 +11,23 @@ import kotlinx.css.*
 import io.ktor.client.*
 import io.ktor.client.engine.apache.*
 import kotlinx.coroutines.*
+import java.util.concurrent.atomic.AtomicLong
+import kotlin.concurrent.thread
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
-    println("Start")
+    val c = AtomicLong()
 
-    // Start a coroutine
-    GlobalScope.launch {
-        println("launch")
-        delay(1000)
-        println("launch end")
-    }
+    for (i in 1..1_000_000L)
+//        thread(start = true) {
+        GlobalScope.launch {
+            c.addAndGet(i)
+        }
 
-    runBlocking {
-        println("runBlocking")
-        delay(2000)
-        println("runBlocking end")
-    }
-
-//    Thread.sleep(2000) // wait for 2 seconds
-    println("Stop")
+    println(c.get())
 
     val client = HttpClient(Apache) {
     }
