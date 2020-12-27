@@ -19,15 +19,17 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
-    val c = AtomicLong()
-
-    for (i in 1..1_000_000L)
-//        thread(start = true) {
-        GlobalScope.launch {
-            c.addAndGet(i)
+    val deferred = (1..1_000_000).map { n ->
+        GlobalScope.async {
+            delay(1000)
+            n
         }
+    }
 
-    println(c.get())
+    runBlocking {
+        val sum = deferred.sumOf { it.await().toLong() }
+        println("Sum: $sum")
+    }
 
     val client = HttpClient(Apache) {
     }
